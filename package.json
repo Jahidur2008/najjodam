@@ -1,0 +1,31 @@
+{
+  "name": "najjo-dam",
+  "version": "1.0.0",
+  "description": "ন্যায্য দাম (Najjo Dam - কৃষকের বাজারদর) - Full-Stack Agricultural Market Price Platform for Bangladesh",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "server:dev": "npm --prefix server run dev",
+    "server:start": "npm --prefix server start",
+    "server:seed": "npm --prefix server run seed",
+    "server:update-admin": "npm --prefix server run update-admin --",
+    "client:dev": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build",
+    "client:start": "npm --prefix client run start"
+  },
+  "keywords": [
+    "bangladesh",
+    "agriculture",
+    "market-prices",
+    "farmers",
+    "krishi",
+    "nextjs",
+    "express",
+    "mongodb"
+  ],
+  "author": "Najjo Dam Team",
+  "license": "ISC"
+}

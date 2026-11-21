@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 80" width="340" height="80" fill="none">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#15803D"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#047857" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Brand Emblem Badge -->
+  <g transform="translate(10, 8)" filter="url(#shadow)">
+    <!-- Outer Shield/Circle -->
+    <rect width="64" height="64" rx="16" fill="url(#leafGrad)"/>
+    <rect x="2" y="2" width="60" height="60" rx="14" stroke="#86EFAC" stroke-width="1.5" stroke-opacity="0.4"/>
+    
+    <!-- Stylized Golden Paddy Stalk & Balance Scales -->
+    <!-- Scale Beam -->
+    <path d="M22 28 H42" stroke="#FDE68A" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="32" cy="24" r="3" fill="#FDE68A"/>
+    <path d="M32 24 V44" stroke="#FDE68A" stroke-width="2" stroke-linecap="round"/>
+    
+    <!-- Left Scale Pan -->
+    <path d="M22 28 L17 38 H27 Z" fill="url(#goldGrad)"/>
+    <!-- Right Scale Pan -->
+    <path d="M42 28 L37 38 H47 Z" fill="url(#goldGrad)"/>
+
+    <!-- Green Sprout leaf rising -->
+    <path d="M32 44 C26 38, 22 46, 32 52 C42 46, 38 38, 32 44 Z" fill="#4ADE80"/>
+  </g>
+
+  <!-- Typography: Brand Name -->
+  <g transform="translate(86, 20)">
+    <text x="0" y="24" font-family="'Hind Siliguri', 'Inter', -apple-system, sans-serif" font-size="28" font-weight="800" fill="#0F172A" letter-spacing="-0.5">
+      ন্যায্য <tspan fill="#15803D">দাম</tspan>
+    </text>
+    <!-- Accent Dot/Leaf -->
+    <circle cx="118" cy="10" r="3.5" fill="#D97706"/>
+    
+    <!-- Subtitle -->
+    <text x="0" y="44" font-family="'Hind Siliguri', 'Inter', -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#64748B" letter-spacing="0.2">
+      কৃষকের নির্ভরযোগ্য বাজারদর • উন্মুক্ত প্ল্যাটফর্ম
+    </text>
+  </g>
+</svg>

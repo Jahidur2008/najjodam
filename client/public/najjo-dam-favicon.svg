@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="leafGradFav2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#15803D"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="goldGradFav2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="16" fill="url(#leafGradFav2)"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" stroke="#86EFAC" stroke-width="1.5" stroke-opacity="0.5"/>
+  
+  <!-- Scale Beam -->
+  <path d="M18 26 H46" stroke="#FDE68A" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="20" r="3.5" fill="#FDE68A"/>
+  <path d="M32 20 V46" stroke="#FDE68A" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Left Scale Pan -->
+  <path d="M18 26 L12 38 H24 Z" fill="url(#goldGradFav2)"/>
+  <!-- Right Scale Pan -->
+  <path d="M46 26 L40 38 H52 Z" fill="url(#goldGradFav2)"/>
+
+  <!-- Sprout -->
+  <path d="M32 46 C24 40, 20 48, 32 54 C44 48, 40 40, 32 46 Z" fill="#4ADE80"/>
+</svg>
