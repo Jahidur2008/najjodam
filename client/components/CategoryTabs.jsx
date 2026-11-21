@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
-import {
-  Wheat,
-  Coins,
-  CircleDot,
-  Droplets,
-  Flame,
-  Carrot,
-  Apple,
-  Flower2,
-  Fish,
-  LayoutGrid,
-  ChevronLeft,
-  ChevronRight
-} from "lucide-react";
-import { cn } from "@/lib/utils";
 import { toBengaliNumber } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import {
+  Apple,
+  Carrot,
+  ChevronLeft,
+  ChevronRight,
+  CircleDot,
+  Coins,
+  Droplets,
+  Fish,
+  Flame,
+  Flower2,
+  LayoutGrid,
+  Wheat
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const CATEGORY_MAP = [
   {
