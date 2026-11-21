@@ -19,25 +19,31 @@ const storage = multer.diskStorage({
       .basename(file.originalname, ext)
       .replace(/[^a-zA-Z0-9_-]/g, '_')
       .slice(0, 30);
+    const prefix = file.fieldname || 'file';
     const uniqueSuffix = `${Date.now()}_${Math.round(Math.random() * 1e6)}`;
-    cb(null, `prod_${cleanBasename}_${uniqueSuffix}${ext}`);
+    cb(null, `${prefix}_${cleanBasename}_${uniqueSuffix}${ext}`);
   }
 });
 
-// File Type Filter
+// File Type Filter (supports JPG, PNG, WEBP, SVG, and ICO)
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     'image/jpeg',
     'image/png',
     'image/webp',
     'image/jpg',
-    'image/svg+xml'
+    'image/svg+xml',
+    'image/x-icon',
+    'image/vnd.microsoft.icon'
   ];
 
-  if (allowedMimeTypes.includes(file.mimetype)) {
+  const ext = path.extname(file.originalname).toLowerCase();
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.ico'];
+
+  if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Only JPEG, PNG, WEBP, and SVG image files are allowed'), false);
+    cb(new Error('শুধুমাত্র JPG, JPEG, PNG, WEBP এবং SVG ফাইল আপলোড করা যাবে।'), false);
   }
 };
 

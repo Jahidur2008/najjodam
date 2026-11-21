@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const SiteSetting = require('../models/SiteSetting');
@@ -919,6 +921,167 @@ const deleteSubAdmin = async (req, res, next) => {
   }
 };
 
+// ==========================================
+// 8. Branding & Dynamic Logo/Favicon Settings
+// ==========================================
+
+// @desc    Get current site branding & settings
+// @route   GET /api/admin/site-settings
+// @access  Private (Admin)
+const getAdminSiteSettings = async (req, res, next) => {
+  try {
+    const settings = await SiteSetting.getSettings();
+    res.json({
+      success: true,
+      data: settings
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Upload new Website Logo (JPG, PNG, WEBP, SVG)
+// @route   POST /api/admin/site-settings/logo
+// @access  Private (Admin)
+const uploadSiteLogo = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'দয়া করে একটি লোগো ইমেজ ফাইল সিলেক্ট করুন।'
+      });
+    }
+
+    const settings = await SiteSetting.getSettings();
+
+    // Safely delete previous custom uploaded logo file if present
+    if (settings.logoUrl && settings.logoUrl.startsWith('/uploads/')) {
+      const oldFilePath = path.join(__dirname, '..', settings.logoUrl);
+      if (fs.existsSync(oldFilePath)) {
+        try {
+          fs.unlinkSync(oldFilePath);
+        } catch (unlinkErr) {
+          console.error('[Branding] Error removing old logo file:', unlinkErr.message);
+        }
+      }
+    }
+
+    settings.logoUrl = `/uploads/${req.file.filename}`;
+    await settings.save();
+
+    res.json({
+      success: true,
+      message: 'ওয়েবসাইট লোগো সফলভাবে আপলোড ও আপডেট করা হয়েছে।',
+      data: settings
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reset Website Logo back to default SVG
+// @route   DELETE /api/admin/site-settings/logo
+// @access  Private (Admin)
+const resetSiteLogo = async (req, res, next) => {
+  try {
+    const settings = await SiteSetting.getSettings();
+
+    // Safely delete custom file from disk if present
+    if (settings.logoUrl && settings.logoUrl.startsWith('/uploads/')) {
+      const oldFilePath = path.join(__dirname, '..', settings.logoUrl);
+      if (fs.existsSync(oldFilePath)) {
+        try {
+          fs.unlinkSync(oldFilePath);
+        } catch (unlinkErr) {
+          console.error('[Branding] Error deleting logo file:', unlinkErr.message);
+        }
+      }
+    }
+
+    settings.logoUrl = '/images/najjo-dam-logo.svg';
+    await settings.save();
+
+    res.json({
+      success: true,
+      message: 'লোগো ডিফল্ট অবস্থায় ফিরিয়ে আনা হয়েছে।',
+      data: settings
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Upload new Website Favicon (JPG, PNG, WEBP, SVG, ICO)
+// @route   POST /api/admin/site-settings/favicon
+// @access  Private (Admin)
+const uploadSiteFavicon = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'দয়া করে একটি ফ্যাভিকন ইমেজ ফাইল সিলেক্ট করুন।'
+      });
+    }
+
+    const settings = await SiteSetting.getSettings();
+
+    // Safely delete previous custom uploaded favicon file if present
+    if (settings.faviconUrl && settings.faviconUrl.startsWith('/uploads/')) {
+      const oldFilePath = path.join(__dirname, '..', settings.faviconUrl);
+      if (fs.existsSync(oldFilePath)) {
+        try {
+          fs.unlinkSync(oldFilePath);
+        } catch (unlinkErr) {
+          console.error('[Branding] Error removing old favicon file:', unlinkErr.message);
+        }
+      }
+    }
+
+    settings.faviconUrl = `/uploads/${req.file.filename}`;
+    await settings.save();
+
+    res.json({
+      success: true,
+      message: 'ওয়েবসাইট ফ্যাভিকন সফলভাবে আপলোড ও আপডেট করা হয়েছে।',
+      data: settings
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reset Website Favicon back to default SVG
+// @route   DELETE /api/admin/site-settings/favicon
+// @access  Private (Admin)
+const resetSiteFavicon = async (req, res, next) => {
+  try {
+    const settings = await SiteSetting.getSettings();
+
+    // Safely delete custom file from disk if present
+    if (settings.faviconUrl && settings.faviconUrl.startsWith('/uploads/')) {
+      const oldFilePath = path.join(__dirname, '..', settings.faviconUrl);
+      if (fs.existsSync(oldFilePath)) {
+        try {
+          fs.unlinkSync(oldFilePath);
+        } catch (unlinkErr) {
+          console.error('[Branding] Error deleting favicon file:', unlinkErr.message);
+        }
+      }
+    }
+
+    settings.faviconUrl = '/images/najjo-dam-favicon.svg';
+    await settings.save();
+
+    res.json({
+      success: true,
+      message: 'ফ্যাভিকন ডিফল্ট অবস্থায় ফিরিয়ে আনা হয়েছে।',
+      data: settings
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   // Auth, Registration & Stats
   getRegistrationStatus,
@@ -929,6 +1092,12 @@ module.exports = {
   getManagedAdmins,
   toggleAdminRegistration,
   deleteSubAdmin,
+  // Branding & Logo/Favicon
+  getAdminSiteSettings,
+  uploadSiteLogo,
+  resetSiteLogo,
+  uploadSiteFavicon,
+  resetSiteFavicon,
   // Products
   getProductsAdmin,
   createProductAdmin,

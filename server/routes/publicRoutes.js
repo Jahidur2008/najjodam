@@ -5,9 +5,11 @@ const {
   getPublicCategories,
   getPublicNotices,
   getPublicPrices,
-  compareProductPrices
+  compareProductPrices,
+  getPublicSiteSettings
 } = require('../controllers/publicController');
 
+router.get('/site-settings', getPublicSiteSettings);
 router.get('/locations', getPublicLocations);
 router.get('/categories', getPublicCategories);
 router.get('/notices', getPublicNotices);

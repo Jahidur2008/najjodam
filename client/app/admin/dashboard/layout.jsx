@@ -11,6 +11,7 @@ import {
   Package,
   Globe2,
   Megaphone,
+  Palette,
   UserCog,
   Crown,
   LogOut,
@@ -53,6 +54,11 @@ const NAV_ITEMS = [
     icon: Megaphone
   },
   {
+    href: "/admin/dashboard/branding",
+    label: "লোগো ও ফ্যাভিকন",
+    icon: Palette
+  },
+  {
     href: "/admin/dashboard/access-control",
     label: "অ্যাডমিন ও অ্যাক্সেস কন্ট্রোল",
     icon: UserCog,
@@ -61,10 +67,11 @@ const NAV_ITEMS = [
 ];
 
 export default function AdminDashboardLayout({ children }) {
-  const { admin, isAuthenticated, isLoading, logout } = useAdminAuth();
+  const { admin, isAuthenticated, isLoading, logout, apiBaseUrl } = useAdminAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("/images/najjo-dam-logo.svg");
 
   // Authentication Guard: Redirect to login if not authenticated
   useEffect(() => {
@@ -72,6 +79,31 @@ export default function AdminDashboardLayout({ children }) {
       router.push("/admin/login");
     }
   }, [isLoading, isAuthenticated, router]);
+
+  // Fetch dynamic branding logo
+  useEffect(() => {
+    const fetchBranding = async () => {
+      try {
+        const base = apiBaseUrl || "http://localhost:5000";
+        const res = await fetch(`${base}/api/public/site-settings`);
+        const json = await res.json();
+        if (json?.data?.logoUrl) {
+          const raw = json.data.logoUrl;
+          setLogoUrl(
+            raw.startsWith("http")
+              ? raw
+              : raw.startsWith("/uploads")
+              ? `${base}${raw}`
+              : raw
+          );
+        }
+      } catch (err) {
+        console.debug("[DashboardLayout] Using fallback logo:", err);
+      }
+    };
+
+    fetchBranding();
+  }, [apiBaseUrl]);
 
   if (isLoading) {
     return (
@@ -99,14 +131,11 @@ export default function AdminDashboardLayout({ children }) {
       {/* 1. Mobile Top Navigation Bar (Hidden on Desktop) */}
       <div className="lg:hidden bg-[#0F172A] text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-50">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <div className="relative w-36 h-9">
-            <Image
-              src="/images/najjo-dam-logo.svg"
+          <div className="relative h-8 w-auto max-w-[144px] flex items-center shrink-0">
+            <img
+              src={logoUrl}
               alt="ন্যায্য দাম"
-              width={144}
-              height={36}
-              priority
-              className="h-8 w-auto object-contain filter brightness-110"
+              className="h-8 w-auto max-w-[144px] object-contain filter brightness-110"
             />
           </div>
         </Link>
@@ -135,14 +164,11 @@ export default function AdminDashboardLayout({ children }) {
       >
         <div className="shrink-0 p-5 border-b border-slate-800 flex items-center justify-between">
           <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)}>
-            <div className="relative w-36 h-9">
-              <Image
-                src="/images/najjo-dam-logo.svg"
+            <div className="relative h-8 w-auto max-w-[144px] flex items-center shrink-0">
+              <img
+                src={logoUrl}
                 alt="ন্যায্য দাম"
-                width={144}
-                height={36}
-                priority
-                className="h-8 w-auto object-contain filter brightness-110"
+                className="h-8 w-auto max-w-[144px] object-contain filter brightness-110"
               />
             </div>
           </Link>
@@ -240,14 +266,11 @@ export default function AdminDashboardLayout({ children }) {
         {/* Top Header */}
         <div className="shrink-0 p-5 border-b border-slate-800">
           <Link href="/admin/dashboard" className="block">
-            <div className="relative w-48 h-11 bg-white/10 rounded-xl p-1.5 backdrop-blur-xs flex items-center">
-              <Image
-                src="/images/najjo-dam-logo.svg"
+            <div className="relative h-11 w-auto max-w-[200px] bg-white/10 rounded-xl p-1.5 backdrop-blur-xs flex items-center shrink-0">
+              <img
+                src={logoUrl}
                 alt="ন্যায্য দাম"
-                width={180}
-                height={40}
-                priority
-                className="h-8 w-auto object-contain filter brightness-110"
+                className="h-8 w-auto max-w-[180px] object-contain filter brightness-110"
               />
             </div>
           </Link>

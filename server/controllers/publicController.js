@@ -1,6 +1,7 @@
 const Product = require('../models/Product');
 const MarketPrice = require('../models/MarketPrice');
 const Notice = require('../models/Notice');
+const SiteSetting = require('../models/SiteSetting');
 const {
   bdLocations,
   DEFAULT_LOCATION,
@@ -401,10 +402,31 @@ const compareProductPrices = async (req, res, next) => {
   }
 };
 
+// @desc    Get website branding & public settings (Logo, Favicon, Registration state)
+// @route   GET /api/public/site-settings
+// @access  Public
+const getPublicSiteSettings = async (req, res, next) => {
+  try {
+    const settings = await SiteSetting.getSettings();
+    res.json({
+      success: true,
+      data: {
+        logoUrl: settings.logoUrl || '/images/najjo-dam-logo.svg',
+        faviconUrl: settings.faviconUrl || '/images/najjo-dam-favicon.svg',
+        isAdminRegistrationOpen: Boolean(settings.isAdminRegistrationOpen),
+        updatedAt: settings.updatedAt
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getPublicLocations,
   getPublicCategories,
   getPublicNotices,
   getPublicPrices,
-  compareProductPrices
+  compareProductPrices,
+  getPublicSiteSettings
 };

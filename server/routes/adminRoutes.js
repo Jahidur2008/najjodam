@@ -13,6 +13,12 @@ const {
   getManagedAdmins,
   toggleAdminRegistration,
   deleteSubAdmin,
+  // Branding & Logo/Favicon
+  getAdminSiteSettings,
+  uploadSiteLogo,
+  resetSiteLogo,
+  uploadSiteFavicon,
+  resetSiteFavicon,
   // Products
   getProductsAdmin,
   createProductAdmin,
@@ -50,6 +56,13 @@ router.use(protect);
 
 // Dashboard Statistics
 router.get('/dashboard-stats', getDashboardStats);
+
+// Branding, Website Logo & Favicon Management
+router.get('/site-settings', getAdminSiteSettings);
+router.post('/site-settings/logo', upload.single('logo'), uploadSiteLogo);
+router.delete('/site-settings/logo', resetSiteLogo);
+router.post('/site-settings/favicon', upload.single('favicon'), uploadSiteFavicon);
+router.delete('/site-settings/favicon', resetSiteFavicon);
 
 // Master Admin Access Control Routes
 router.get('/manage/admins', requireMasterAdmin, getManagedAdmins);

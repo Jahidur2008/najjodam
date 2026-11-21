@@ -28,9 +28,10 @@ export default function AdminLoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Dynamic registration status state
+  // Dynamic registration status & Branding state
   const [canRegister, setCanRegister] = useState(false);
   const [isFirstSetup, setIsFirstSetup] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("/images/najjo-dam-logo.svg");
 
   const { login, isAuthenticated, isLoading, apiBaseUrl } = useAdminAuth();
   const router = useRouter();
@@ -42,21 +43,38 @@ export default function AdminLoginPage() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Check if registration is open or first-time setup
+  // Check registration status & branding logo
   useEffect(() => {
-    const checkRegistrationStatus = async () => {
+    const fetchStatusAndBranding = async () => {
       try {
-        const res = await axios.get(`${apiBaseUrl}/api/admin/registration-status`);
-        if (res.data?.success) {
-          setCanRegister(Boolean(res.data.canRegister));
-          setIsFirstSetup(Boolean(res.data.isFirstSetup));
+        const [statusRes, brandRes] = await Promise.allSettled([
+          axios.get(`${apiBaseUrl}/api/admin/registration-status`),
+          axios.get(`${apiBaseUrl}/api/public/site-settings`)
+        ]);
+
+        if (statusRes.status === "fulfilled" && statusRes.value.data?.success) {
+          setCanRegister(Boolean(statusRes.value.data.canRegister));
+          setIsFirstSetup(Boolean(statusRes.value.data.isFirstSetup));
+        }
+
+        if (brandRes.status === "fulfilled" && brandRes.value.data?.success) {
+          const raw = brandRes.value.data.data?.logoUrl;
+          if (raw) {
+            setLogoUrl(
+              raw.startsWith("http")
+                ? raw
+                : raw.startsWith("/uploads")
+                ? `${apiBaseUrl}${raw}`
+                : raw
+            );
+          }
         }
       } catch (err) {
-        console.error("Error fetching registration status:", err);
+        console.error("Error fetching login page settings:", err);
       }
     };
 
-    checkRegistrationStatus();
+    fetchStatusAndBranding();
   }, [apiBaseUrl]);
 
   const handleSubmit = async (e) => {
@@ -99,13 +117,11 @@ export default function AdminLoginPage() {
         
         {/* Brand Logo Header */}
         <div className="text-center mb-6">
-          <div className="relative w-48 h-12 mx-auto mb-3">
-            <Image
-              src="/images/najjo-dam-logo.svg"
+          <div className="relative h-11 sm:h-12 w-auto max-w-[200px] mx-auto mb-3 flex items-center justify-center">
+            <img
+              src={logoUrl}
               alt="ন্যায্য দাম"
-              fill
-              className="object-contain"
-              priority
+              className="h-11 sm:h-12 w-auto max-w-[200px] object-contain mx-auto"
             />
           </div>
           <div className="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-800 text-xs font-bold px-3 py-1 rounded-full">

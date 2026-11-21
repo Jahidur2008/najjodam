@@ -34,6 +34,7 @@ export default function AdminRegisterPage() {
   const [statusLoading, setStatusLoading] = useState(true);
   const [canRegister, setCanRegister] = useState(false);
   const [isFirstSetup, setIsFirstSetup] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("/images/najjo-dam-logo.svg");
 
   const [errorMessage, setErrorMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -48,17 +49,34 @@ export default function AdminRegisterPage() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Check dynamic registration status
+  // Check dynamic registration status & branding logo
   useEffect(() => {
     const checkStatus = async () => {
       try {
         setStatusLoading(true);
-        const res = await axios.get(`${apiBaseUrl}/api/admin/registration-status`);
-        if (res.data?.success) {
-          setCanRegister(Boolean(res.data.canRegister));
-          setIsFirstSetup(Boolean(res.data.isFirstSetup));
+        const [statusRes, brandRes] = await Promise.allSettled([
+          axios.get(`${apiBaseUrl}/api/admin/registration-status`),
+          axios.get(`${apiBaseUrl}/api/public/site-settings`)
+        ]);
+
+        if (statusRes.status === "fulfilled" && statusRes.value.data?.success) {
+          setCanRegister(Boolean(statusRes.value.data.canRegister));
+          setIsFirstSetup(Boolean(statusRes.value.data.isFirstSetup));
         } else {
           setCanRegister(false);
+        }
+
+        if (brandRes.status === "fulfilled" && brandRes.value.data?.success) {
+          const raw = brandRes.value.data.data?.logoUrl;
+          if (raw) {
+            setLogoUrl(
+              raw.startsWith("http")
+                ? raw
+                : raw.startsWith("/uploads")
+                ? `${apiBaseUrl}${raw}`
+                : raw
+            );
+          }
         }
       } catch (err) {
         console.error("Error checking registration status:", err);
@@ -157,13 +175,11 @@ export default function AdminRegisterPage() {
         
         {/* Brand Logo Header */}
         <div className="text-center mb-6">
-          <div className="relative w-48 h-12 mx-auto mb-3">
-            <Image
-              src="/images/najjo-dam-logo.svg"
+          <div className="relative h-11 sm:h-12 w-auto max-w-[200px] mx-auto mb-3 flex items-center justify-center">
+            <img
+              src={logoUrl}
               alt="ন্যায্য দাম"
-              fill
-              className="object-contain"
-              priority
+              className="h-11 sm:h-12 w-auto max-w-[200px] object-contain mx-auto"
             />
           </div>
 

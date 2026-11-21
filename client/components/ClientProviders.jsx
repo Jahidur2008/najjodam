@@ -3,7 +3,13 @@
 
 import React from "react";
 import { AdminAuthProvider } from "@/context/AdminAuthContext";
+import DynamicFavicon from "@/components/DynamicFavicon";
 
 export default function ClientProviders({ children }) {
-  return <AdminAuthProvider>{children}</AdminAuthProvider>;
+  return (
+    <AdminAuthProvider>
+      <DynamicFavicon />
+      {children}
+    </AdminAuthProvider>
+  );
 }
