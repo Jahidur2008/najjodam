@@ -24,6 +24,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { Button } from "@/components/ui/button";
 
 const NAV_ITEMS = [
@@ -67,11 +68,11 @@ const NAV_ITEMS = [
 ];
 
 export default function AdminDashboardLayout({ children }) {
-  const { admin, isAuthenticated, isLoading, logout, apiBaseUrl } = useAdminAuth();
+  const { admin, isAuthenticated, isLoading, logout } = useAdminAuth();
+  const { logoUrl } = useSiteSettings();
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [logoUrl, setLogoUrl] = useState("/images/najjo-dam-logo.svg");
 
   // Authentication Guard: Redirect to login if not authenticated
   useEffect(() => {
@@ -79,31 +80,6 @@ export default function AdminDashboardLayout({ children }) {
       router.push("/admin/login");
     }
   }, [isLoading, isAuthenticated, router]);
-
-  // Fetch dynamic branding logo
-  useEffect(() => {
-    const fetchBranding = async () => {
-      try {
-        const base = apiBaseUrl || "http://localhost:5000";
-        const res = await fetch(`${base}/api/public/site-settings`);
-        const json = await res.json();
-        if (json?.data?.logoUrl) {
-          const raw = json.data.logoUrl;
-          setLogoUrl(
-            raw.startsWith("http")
-              ? raw
-              : raw.startsWith("/uploads")
-              ? `${base}${raw}`
-              : raw
-          );
-        }
-      } catch (err) {
-        console.debug("[DashboardLayout] Using fallback logo:", err);
-      }
-    };
-
-    fetchBranding();
-  }, [apiBaseUrl]);
 
   if (isLoading) {
     return (
@@ -131,11 +107,15 @@ export default function AdminDashboardLayout({ children }) {
       {/* 1. Mobile Top Navigation Bar (Hidden on Desktop) */}
       <div className="lg:hidden bg-[#0F172A] text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-50">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <div className="relative h-8 w-auto max-w-[144px] flex items-center shrink-0">
+          <div
+            className="relative flex items-center shrink-0"
+            style={{ height: "calc(var(--spacing) * 18)" }}
+          >
             <img
               src={logoUrl}
               alt="ন্যায্য দাম"
-              className="h-8 w-auto max-w-[144px] object-contain filter brightness-110"
+              className="h-18 w-auto max-w-[260px] object-contain filter brightness-110"
+              style={{ height: "calc(var(--spacing) * 18)" }}
             />
           </div>
         </Link>
@@ -164,11 +144,15 @@ export default function AdminDashboardLayout({ children }) {
       >
         <div className="shrink-0 p-5 border-b border-slate-800 flex items-center justify-between">
           <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)}>
-            <div className="relative h-8 w-auto max-w-[144px] flex items-center shrink-0">
+            <div
+              className="relative flex items-center shrink-0"
+              style={{ height: "calc(var(--spacing) * 18)" }}
+            >
               <img
                 src={logoUrl}
                 alt="ন্যায্য দাম"
-                className="h-8 w-auto max-w-[144px] object-contain filter brightness-110"
+                className="h-18 w-auto max-w-[260px] object-contain filter brightness-110"
+                style={{ height: "calc(var(--spacing) * 18)" }}
               />
             </div>
           </Link>
@@ -263,14 +247,18 @@ export default function AdminDashboardLayout({ children }) {
       {/* 2. Desktop Full-Height Sticky Sidebar (Fixed h-screen with No White Gap) */}
       <aside className="hidden lg:flex lg:flex-col lg:w-72 lg:h-screen lg:sticky lg:top-0 lg:shrink-0 bg-[#0F172A] text-white overflow-y-auto z-30">
         
-        {/* Top Header */}
-        <div className="shrink-0 p-5 border-b border-slate-800">
+        {/* Top Header with h-18 (72px) Logo */}
+        <div className="shrink-0 p-4 border-b border-slate-800">
           <Link href="/admin/dashboard" className="block">
-            <div className="relative h-11 w-auto max-w-[200px] bg-white/10 rounded-xl p-1.5 backdrop-blur-xs flex items-center shrink-0">
+            <div
+              className="relative w-full max-w-[260px] bg-white/10 rounded-2xl p-2 backdrop-blur-xs flex items-center justify-center shrink-0"
+              style={{ height: "calc(var(--spacing) * 18)" }}
+            >
               <img
                 src={logoUrl}
                 alt="ন্যায্য দাম"
-                className="h-8 w-auto max-w-[180px] object-contain filter brightness-110"
+                className="h-18 w-auto max-w-[260px] object-contain filter brightness-110"
+                style={{ height: "calc(var(--spacing) * 18)" }}
               />
             </div>
           </Link>

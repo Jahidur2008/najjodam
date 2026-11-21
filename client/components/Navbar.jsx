@@ -5,49 +5,34 @@ import Link from "next/link";
 import { Calendar, PhoneCall, RefreshCw } from "lucide-react";
 import { getBengaliDate } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Navbar({ onResetToDhaka }) {
   const [currentDate, setCurrentDate] = useState("");
-  const [logoUrl, setLogoUrl] = useState("/images/najjo-dam-logo.svg");
+  const { logoUrl } = useSiteSettings();
 
   useEffect(() => {
     setCurrentDate(getBengaliDate());
-
-    // Fetch dynamic logo from site settings
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    axios
-      .get(`${apiBaseUrl}/api/public/site-settings`)
-      .then((res) => {
-        if (res.data?.success && res.data?.data?.logoUrl) {
-          const raw = res.data.data.logoUrl;
-          const resolved = raw.startsWith("http")
-            ? raw
-            : raw.startsWith("/uploads")
-            ? `${apiBaseUrl}${raw}`
-            : raw;
-          setLogoUrl(resolved);
-        }
-      })
-      .catch((err) => {
-        console.debug("[Navbar] Fallback to default logo:", err.message);
-      });
   }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/95 border-b border-slate-200/80 shadow-xs transition-all">
-      <div className="container mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
+      <div className="container mx-auto px-4 sm:px-6 min-h-[88px] py-2 sm:py-2.5 flex items-center justify-between gap-4">
         
-        {/* Dynamic Brand Logo with Fixed Bounds */}
+        {/* Dynamic Brand Logo with h-18 (72px) Fixed Bounds */}
         <Link
           href="/"
           className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-green-600 rounded-xl p-1 shrink-0"
         >
-          <div className="relative h-11 sm:h-12 w-auto max-w-[200px] flex items-center shrink-0 transition-transform duration-200 group-hover:scale-[1.02]">
+          <div
+            className="relative flex items-center shrink-0 transition-transform duration-200 group-hover:scale-[1.02]"
+            style={{ height: "calc(var(--spacing) * 18)" }}
+          >
             <img
               src={logoUrl}
               alt="ন্যায্য দাম - কৃষকের বাজারদর"
-              className="h-11 sm:h-12 w-auto max-w-[200px] object-contain object-left shrink-0"
+              className="h-18 w-auto max-w-[260px] object-contain object-left shrink-0"
+              style={{ height: "calc(var(--spacing) * 18)" }}
             />
           </div>
         </Link>

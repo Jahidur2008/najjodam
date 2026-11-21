@@ -1,45 +1,29 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { PhoneCall, Heart, ShieldCheck, HelpCircle, ExternalLink } from "lucide-react";
-import axios from "axios";
+import { PhoneCall, Heart, ShieldCheck, ExternalLink } from "lucide-react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Footer() {
-  const [logoUrl, setLogoUrl] = useState("/images/najjo-dam-logo.svg");
-
-  useEffect(() => {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    axios
-      .get(`${apiBaseUrl}/api/public/site-settings`)
-      .then((res) => {
-        if (res.data?.success && res.data?.data?.logoUrl) {
-          const raw = res.data.data.logoUrl;
-          const resolved = raw.startsWith("http")
-            ? raw
-            : raw.startsWith("/uploads")
-            ? `${apiBaseUrl}${raw}`
-            : raw;
-          setLogoUrl(resolved);
-        }
-      })
-      .catch((err) => {
-        console.debug("[Footer] Fallback to default logo:", err.message);
-      });
-  }, []);
+  const { logoUrl } = useSiteSettings();
 
   return (
     <footer className="bg-slate-900 text-slate-300 pt-12 pb-8 border-t border-slate-800 mt-auto">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           
-          {/* Brand Info */}
+          {/* Brand Info with h-18 (72px) Logo */}
           <div className="md:col-span-2 space-y-4">
-            <div className="relative h-12 w-auto max-w-[220px] bg-white/10 rounded-xl p-1.5 backdrop-blur-xs inline-flex items-center">
+            <div
+              className="relative w-auto max-w-[280px] bg-white/10 rounded-2xl p-2 backdrop-blur-xs inline-flex items-center"
+              style={{ height: "calc(var(--spacing) * 18)" }}
+            >
               <img
                 src={logoUrl}
                 alt="ন্যায্য দাম"
-                className="h-11 w-auto max-w-[200px] object-contain object-left px-2 filter brightness-110"
+                className="h-18 w-auto max-w-[260px] object-contain object-left px-2 filter brightness-110"
+                style={{ height: "calc(var(--spacing) * 18)" }}
               />
             </div>
             <p className="text-sm text-slate-400 max-w-md leading-relaxed">

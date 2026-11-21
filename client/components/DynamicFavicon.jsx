@@ -1,63 +1,60 @@
+// @ts-nocheck
 "use client";
 
 import { useEffect } from "react";
-import axios from "axios";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function DynamicFavicon() {
+  const { faviconUrl } = useSiteSettings();
+
   useEffect(() => {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    if (!faviconUrl || typeof document === "undefined") return;
 
-    const fetchAndApplyFavicon = async () => {
-      try {
-        const res = await axios.get(`${apiBaseUrl}/api/public/site-settings`);
-        if (res.data?.success && res.data?.data?.faviconUrl) {
-          const raw = res.data.data.faviconUrl;
-          const fullFaviconUrl = raw.startsWith("http")
-            ? raw
-            : raw.startsWith("/uploads")
-            ? `${apiBaseUrl}${raw}`
-            : raw;
+    // Detect MIME type based on file extension
+    let mimeType = "image/x-icon";
+    const cleanUrl = faviconUrl.split("?")[0].toLowerCase();
+    if (cleanUrl.endsWith(".svg")) {
+      mimeType = "image/svg+xml";
+    } else if (cleanUrl.endsWith(".png")) {
+      mimeType = "image/png";
+    } else if (cleanUrl.endsWith(".webp")) {
+      mimeType = "image/webp";
+    } else if (cleanUrl.endsWith(".jpg") || cleanUrl.endsWith(".jpeg")) {
+      mimeType = "image/jpeg";
+    } else if (cleanUrl.endsWith(".ico")) {
+      mimeType = "image/x-icon";
+    }
 
-          // Determine mime type from extension
-          let mimeType = "image/x-icon";
-          if (fullFaviconUrl.endsWith(".svg")) {
-            mimeType = "image/svg+xml";
-          } else if (fullFaviconUrl.endsWith(".png")) {
-            mimeType = "image/png";
-          } else if (fullFaviconUrl.endsWith(".webp")) {
-            mimeType = "image/webp";
-          } else if (fullFaviconUrl.endsWith(".jpg") || fullFaviconUrl.endsWith(".jpeg")) {
-            mimeType = "image/jpeg";
-          }
-
-          // Update or create standard icon
-          let link = document.querySelector("link[rel='icon']");
-          if (!link) {
-            link = document.createElement("link");
-            link.rel = "icon";
-            document.head.appendChild(link);
-          }
-          link.href = fullFaviconUrl;
-          link.type = mimeType;
-
-          // Update or create shortcut icon
-          let shortcut = document.querySelector("link[rel='shortcut icon']");
-          if (!shortcut) {
-            shortcut = document.createElement("link");
-            shortcut.rel = "shortcut icon";
-            document.head.appendChild(shortcut);
-          }
-          shortcut.href = fullFaviconUrl;
-          shortcut.type = mimeType;
-        }
-      } catch (err) {
-        // Fallback silently if API is offline
-        console.debug("[DynamicFavicon] Using default favicon:", err.message);
+    // 1. Remove ALL existing icon / favicon links in document.head
+    const existingLinks = document.querySelectorAll(
+      "link[rel*='icon'], link[rel='shortcut icon'], link[rel='apple-touch-icon']"
+    );
+    existingLinks.forEach((el) => {
+      if (el.parentNode) {
+        el.parentNode.removeChild(el);
       }
-    };
+    });
 
-    fetchAndApplyFavicon();
-  }, []);
+    // 2. Append fresh <link rel="icon" ... />
+    const linkIcon = document.createElement("link");
+    linkIcon.rel = "icon";
+    linkIcon.type = mimeType;
+    linkIcon.href = faviconUrl;
+    document.head.appendChild(linkIcon);
+
+    // 3. Append fresh <link rel="shortcut icon" ... />
+    const linkShortcut = document.createElement("link");
+    linkShortcut.rel = "shortcut icon";
+    linkShortcut.type = mimeType;
+    linkShortcut.href = faviconUrl;
+    document.head.appendChild(linkShortcut);
+
+    // 4. Append <link rel="apple-touch-icon" ... /> for mobile device bookmarks
+    const linkApple = document.createElement("link");
+    linkApple.rel = "apple-touch-icon";
+    linkApple.href = faviconUrl;
+    document.head.appendChild(linkApple);
+  }, [faviconUrl]);
 
   return null;
 }

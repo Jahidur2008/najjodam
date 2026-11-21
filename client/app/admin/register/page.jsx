@@ -20,6 +20,7 @@ import {
   LockKeyhole
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
@@ -34,8 +35,8 @@ export default function AdminRegisterPage() {
   const [statusLoading, setStatusLoading] = useState(true);
   const [canRegister, setCanRegister] = useState(false);
   const [isFirstSetup, setIsFirstSetup] = useState(false);
-  const [logoUrl, setLogoUrl] = useState("/images/najjo-dam-logo.svg");
 
+  const { logoUrl } = useSiteSettings();
   const [errorMessage, setErrorMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -49,34 +50,17 @@ export default function AdminRegisterPage() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Check dynamic registration status & branding logo
+  // Check dynamic registration status
   useEffect(() => {
     const checkStatus = async () => {
       try {
         setStatusLoading(true);
-        const [statusRes, brandRes] = await Promise.allSettled([
-          axios.get(`${apiBaseUrl}/api/admin/registration-status`),
-          axios.get(`${apiBaseUrl}/api/public/site-settings`)
-        ]);
-
-        if (statusRes.status === "fulfilled" && statusRes.value.data?.success) {
-          setCanRegister(Boolean(statusRes.value.data.canRegister));
-          setIsFirstSetup(Boolean(statusRes.value.data.isFirstSetup));
+        const statusRes = await axios.get(`${apiBaseUrl}/api/admin/registration-status`);
+        if (statusRes.data?.success) {
+          setCanRegister(Boolean(statusRes.data.canRegister));
+          setIsFirstSetup(Boolean(statusRes.data.isFirstSetup));
         } else {
           setCanRegister(false);
-        }
-
-        if (brandRes.status === "fulfilled" && brandRes.value.data?.success) {
-          const raw = brandRes.value.data.data?.logoUrl;
-          if (raw) {
-            setLogoUrl(
-              raw.startsWith("http")
-                ? raw
-                : raw.startsWith("/uploads")
-                ? `${apiBaseUrl}${raw}`
-                : raw
-            );
-          }
         }
       } catch (err) {
         console.error("Error checking registration status:", err);
@@ -173,13 +157,17 @@ export default function AdminRegisterPage() {
       {/* Main Registration Card */}
       <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 relative z-10">
         
-        {/* Brand Logo Header */}
+        {/* Brand Logo Header with h-18 (72px) */}
         <div className="text-center mb-6">
-          <div className="relative h-11 sm:h-12 w-auto max-w-[200px] mx-auto mb-3 flex items-center justify-center">
+          <div
+            className="relative w-auto max-w-[260px] mx-auto mb-4 flex items-center justify-center"
+            style={{ height: "calc(var(--spacing) * 18)" }}
+          >
             <img
               src={logoUrl}
               alt="ন্যায্য দাম"
-              className="h-11 sm:h-12 w-auto max-w-[200px] object-contain mx-auto"
+              className="h-18 w-auto max-w-[260px] object-contain mx-auto"
+              style={{ height: "calc(var(--spacing) * 18)" }}
             />
           </div>
 

@@ -18,6 +18,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -31,6 +32,7 @@ import {
 
 export default function BrandingManagementPage() {
   const { authAxios, apiBaseUrl } = useAdminAuth();
+  const { refreshSettings } = useSiteSettings();
 
   // Settings state
   const [loading, setLoading] = useState(true);
@@ -149,6 +151,10 @@ export default function BrandingManagementPage() {
         setLogoFile(null);
         setLogoPreview(null);
         if (logoInputRef.current) logoInputRef.current.value = "";
+        await refreshSettings();
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("site-settings-updated"));
+        }
         setFeedback({
           type: "success",
           message: res.data.message || "ওয়েবসাইট লোগো সফলভাবে আপডেট হয়েছে!"
@@ -176,6 +182,10 @@ export default function BrandingManagementPage() {
         setLogoFile(null);
         setLogoPreview(null);
         if (logoInputRef.current) logoInputRef.current.value = "";
+        await refreshSettings();
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("site-settings-updated"));
+        }
         setFeedback({
           type: "success",
           message: "লোগো সফলভাবে ডিফল্ট সিস্টেমে ফিরিয়ে আনা হয়েছে।"
@@ -212,6 +222,10 @@ export default function BrandingManagementPage() {
         setFaviconFile(null);
         setFaviconPreview(null);
         if (faviconInputRef.current) faviconInputRef.current.value = "";
+        await refreshSettings();
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("site-settings-updated"));
+        }
         setFeedback({
           type: "success",
           message: res.data.message || "ওয়েবসাইট ফ্যাভিকন সফলভাবে আপডেট হয়েছে!"
@@ -239,6 +253,10 @@ export default function BrandingManagementPage() {
         setFaviconFile(null);
         setFaviconPreview(null);
         if (faviconInputRef.current) faviconInputRef.current.value = "";
+        await refreshSettings();
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("site-settings-updated"));
+        }
         setFeedback({
           type: "success",
           message: "ফ্যাভিকন সফলভাবে ডিফল্ট সিস্টেমে ফিরিয়ে আনা হয়েছে।"
@@ -348,17 +366,21 @@ export default function BrandingManagementPage() {
               </Badge>
             </div>
 
-            {/* Live Preview Box with Fixed Constraint */}
+            {/* Live Preview Box with Fixed h-18 Constraint */}
             <div className="my-5">
               <label className="text-xs font-bold text-slate-600 block mb-2">
                 বর্তমান লোগো ডিসপ্লে প্রিভিউ:
               </label>
-              <div className="w-full h-28 rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-4 flex items-center justify-center relative overflow-hidden group">
-                <div className="h-16 max-w-[220px] flex items-center justify-center">
+              <div className="w-full min-h-[110px] rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-4 flex items-center justify-center relative overflow-hidden group">
+                <div
+                  className="flex items-center justify-center"
+                  style={{ height: "calc(var(--spacing) * 18)" }}
+                >
                   <img
                     src={logoPreview || resolveUrl(settings.logoUrl)}
                     alt="লোগো প্রিভিউ"
-                    className="max-h-16 max-w-[220px] object-contain transition-transform group-hover:scale-105"
+                    className="h-18 w-auto max-w-[260px] object-contain transition-transform group-hover:scale-105"
+                    style={{ height: "calc(var(--spacing) * 18)" }}
                   />
                 </div>
                 {logoPreview && (

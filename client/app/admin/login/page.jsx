@@ -19,6 +19,7 @@ import {
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import axios from "axios";
 
 export default function AdminLoginPage() {
@@ -28,11 +29,11 @@ export default function AdminLoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Dynamic registration status & Branding state
+  // Dynamic registration status
   const [canRegister, setCanRegister] = useState(false);
   const [isFirstSetup, setIsFirstSetup] = useState(false);
-  const [logoUrl, setLogoUrl] = useState("/images/najjo-dam-logo.svg");
 
+  const { logoUrl } = useSiteSettings();
   const { login, isAuthenticated, isLoading, apiBaseUrl } = useAdminAuth();
   const router = useRouter();
 
@@ -43,38 +44,21 @@ export default function AdminLoginPage() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Check registration status & branding logo
+  // Check registration status
   useEffect(() => {
-    const fetchStatusAndBranding = async () => {
+    const fetchStatus = async () => {
       try {
-        const [statusRes, brandRes] = await Promise.allSettled([
-          axios.get(`${apiBaseUrl}/api/admin/registration-status`),
-          axios.get(`${apiBaseUrl}/api/public/site-settings`)
-        ]);
-
-        if (statusRes.status === "fulfilled" && statusRes.value.data?.success) {
-          setCanRegister(Boolean(statusRes.value.data.canRegister));
-          setIsFirstSetup(Boolean(statusRes.value.data.isFirstSetup));
-        }
-
-        if (brandRes.status === "fulfilled" && brandRes.value.data?.success) {
-          const raw = brandRes.value.data.data?.logoUrl;
-          if (raw) {
-            setLogoUrl(
-              raw.startsWith("http")
-                ? raw
-                : raw.startsWith("/uploads")
-                ? `${apiBaseUrl}${raw}`
-                : raw
-            );
-          }
+        const statusRes = await axios.get(`${apiBaseUrl}/api/admin/registration-status`);
+        if (statusRes.data?.success) {
+          setCanRegister(Boolean(statusRes.data.canRegister));
+          setIsFirstSetup(Boolean(statusRes.data.isFirstSetup));
         }
       } catch (err) {
-        console.error("Error fetching login page settings:", err);
+        console.error("Error fetching registration status:", err);
       }
     };
 
-    fetchStatusAndBranding();
+    fetchStatus();
   }, [apiBaseUrl]);
 
   const handleSubmit = async (e) => {
@@ -115,13 +99,17 @@ export default function AdminLoginPage() {
       {/* Main Login Card */}
       <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 relative z-10">
         
-        {/* Brand Logo Header */}
+        {/* Brand Logo Header with h-18 (72px) */}
         <div className="text-center mb-6">
-          <div className="relative h-11 sm:h-12 w-auto max-w-[200px] mx-auto mb-3 flex items-center justify-center">
+          <div
+            className="relative w-auto max-w-[260px] mx-auto mb-4 flex items-center justify-center"
+            style={{ height: "calc(var(--spacing) * 18)" }}
+          >
             <img
               src={logoUrl}
               alt="ন্যায্য দাম"
-              className="h-11 sm:h-12 w-auto max-w-[200px] object-contain mx-auto"
+              className="h-18 w-auto max-w-[260px] object-contain mx-auto"
+              style={{ height: "calc(var(--spacing) * 18)" }}
             />
           </div>
           <div className="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-800 text-xs font-bold px-3 py-1 rounded-full">

@@ -29,11 +29,7 @@ export const metadata: Metadata = {
     "সবজির বাজারদর",
     "Najjo Dam",
     "Bangladesh agri market price"
-  ],
-  icons: {
-    icon: "/icon.svg",
-    shortcut: "/najjo-dam-favicon.svg"
-  }
+  ]
 };
 
 export default function RootLayout({
